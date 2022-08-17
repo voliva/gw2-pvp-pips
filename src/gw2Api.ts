@@ -3,7 +3,10 @@ import { SeasonData } from "./localData";
 import { fetch } from "@tauri-apps/api/http";
 
 export function getCurrentSeason$() {
-  return defer(() => fetch(`https://api.guildwars2.com/v2/pvp/seasons`)).pipe(
+  return defer(() => {
+    console.log("fetching current season");
+    return fetch(`https://api.guildwars2.com/v2/pvp/seasons`);
+  }).pipe(
     map((result) => result.data as any),
     map((result): string => result[result.length - 1]),
     switchMap((seasonId) =>
@@ -30,16 +33,16 @@ export function getCurrentSeason$() {
   );
 }
 
-// Last of https://api.guildwars2.com/v2/pvp/seasons
 export function getSeasonCurrentPips$(apiKey: string, season_id: string) {
-  return defer(() =>
-    fetch(`https://api.guildwars2.com/v2/pvp/standings`, {
+  return defer(() => {
+    console.log("fetching current pips");
+    return fetch(`https://api.guildwars2.com/v2/pvp/standings`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${apiKey}`,
       },
-    })
-  ).pipe(
+    });
+  }).pipe(
     map((result) => result.data as any),
     map(
       (result): number =>

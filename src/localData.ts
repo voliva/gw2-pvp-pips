@@ -4,7 +4,7 @@ import {
   readTextFile,
   writeTextFile,
 } from "@tauri-apps/api/fs";
-import { defer } from "rxjs";
+import { defer, switchMap } from "rxjs";
 
 export interface Goal {
   title: string;
@@ -18,6 +18,13 @@ export interface Config {
   goals: Goal[];
 }
 
+const defaultConfig: Config = {
+  version: 1,
+  apiKey: "",
+  holidays: [],
+  goals: [],
+};
+
 export const readConfig$ = () =>
   defer(async () => {
     try {
@@ -28,25 +35,31 @@ export const readConfig$ = () =>
       return JSON.parse(content) as Config;
     } catch (ex) {
       console.error(ex);
-      return null;
+      return defaultConfig;
     }
   });
 
-export const writeConfig$ = (config: Config) =>
-  defer(async () => {
-    try {
-      await createDir("", { dir: BaseDirectory.App });
-    } catch (ex) {}
+export const writeConfig$ = (config: Partial<Config>) =>
+  readConfig$().pipe(
+    switchMap(async (previousConfig) => {
+      try {
+        // Create directory if it doesn't exist
+        await createDir("", { dir: BaseDirectory.App });
+      } catch (ex) {}
 
-    try {
-      console.log("writing config", config);
-      await writeTextFile("config.json", JSON.stringify(config), {
-        dir: BaseDirectory.App,
-      });
-    } catch (ex) {
-      console.error(ex);
-    }
-  });
+      try {
+        await writeTextFile(
+          "config.json",
+          JSON.stringify({ ...defaultConfig, ...previousConfig, ...config }),
+          {
+            dir: BaseDirectory.App,
+          }
+        );
+      } catch (ex) {
+        console.error(ex);
+      }
+    })
+  );
 
 /** CACHED DATA **/
 
@@ -59,8 +72,8 @@ export interface SeasonData {
 }
 
 export interface LastResult {
+  timestamp: string;
   hadPips: number;
-  remainingDays: number;
 }
 
 export interface CacheData {
@@ -82,13 +95,19 @@ export const readCache$ = () =>
     }
   });
 
-export const writeCache$ = (cacheData: CacheData) =>
-  defer(async () => {
-    try {
-      await writeTextFile("gw2PipsCache.json", JSON.stringify(cacheData), {
-        dir: BaseDirectory.Cache,
-      });
-    } catch (ex) {
-      console.error(ex);
-    }
-  });
+export const writeCache$ = (cacheData: Partial<CacheData>) =>
+  readCache$().pipe(
+    switchMap(async (prevCache) => {
+      try {
+        await writeTextFile(
+          "gw2PipsCache.json",
+          JSON.stringify({ ...prevCache, ...cacheData }),
+          {
+            dir: BaseDirectory.Cache,
+          }
+        );
+      } catch (ex) {
+        console.error(ex);
+      }
+    })
+  );
