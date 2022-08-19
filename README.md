@@ -6,6 +6,13 @@ Desktop App to calculate how many PvP matches should be completed to reach a spe
 
 A link to the latest release can be found within github: [releases](https://github.com/voliva/gw2-pvp-pips/releases)
 
+## TODO
+
+- Configure win/lose points (at the moment it assumes 4 points when lose, 11 points when winning)
+- Configure win/lose rate (at the moment it assumes 50-50)
+- Configure days that the user can't play (at the moment it assumes all days are playable)
+- Support mini-seasons (at the moment it only supports regular seasons)
+
 ## Technical details
 
 Project built using [Tauri](https://tauri.app/), a framework that uses the OS' WebView to render a the front end (in React in this case, but it can be any other JS FE), which is orchestrated by a backend written in Rust.

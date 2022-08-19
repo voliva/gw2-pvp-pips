@@ -1,6 +1,6 @@
-import { defer, filter, map, switchMap, tap } from "rxjs";
-import { SeasonData } from "./localData";
 import { fetch } from "@tauri-apps/api/http";
+import { defer, filter, map, switchMap } from "rxjs";
+import { SeasonData } from "./localData";
 
 export function getCurrentSeason$() {
   return defer(() => {
@@ -32,8 +32,8 @@ export function getCurrentSeason$() {
             })),
           }
         : null
-    ),
-    tap((result) => console.log(result))
+    )
+    // tap((result) => console.log(result))
   );
 }
 
