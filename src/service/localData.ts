@@ -5,6 +5,7 @@ import {
   writeTextFile,
 } from "@tauri-apps/api/fs";
 import { defer, switchMap } from "rxjs";
+import { shareLatest } from "@react-rxjs/core";
 
 export interface Goal {
   title: string;
@@ -25,7 +26,7 @@ const defaultConfig: Config = {
   goals: [],
 };
 
-export const readConfig$ = () =>
+const readConfig$ = () =>
   defer(async () => {
     try {
       const content = await readTextFile("config.json", {
@@ -38,6 +39,8 @@ export const readConfig$ = () =>
       return defaultConfig;
     }
   });
+
+export const initialConfig$ = readConfig$().pipe(shareLatest());
 
 export const writeConfig$ = (config: Partial<Config>) =>
   readConfig$().pipe(
@@ -81,7 +84,7 @@ export interface CacheData {
   lastResult?: LastResult;
 }
 
-export const readCache$ = () =>
+const readCache$ = () =>
   defer(async () => {
     try {
       const content = await readTextFile("gw2PipsCache.json", {
@@ -94,6 +97,8 @@ export const readCache$ = () =>
       return null;
     }
   });
+
+export const cacheData$ = readCache$().pipe(shareLatest());
 
 export const writeCache$ = (cacheData: Partial<CacheData>) =>
   readCache$().pipe(

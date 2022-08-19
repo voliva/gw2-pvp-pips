@@ -1,0 +1,22 @@
+.App {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  overflow: hidden;
+  height: 100vh;
+}
+
+.painted-box {
+  background-color: rgba(255, 255, 255, 0.66);
+  background-clip: padding-box;
+  border-width: 10px 50px;
+  border-image-source: url("./borders_r_66opacity.png");
+  border-image-slice: 18 130 17 137 fill;
+  border-image-width: 10px 50px 10px 50px;
+  border-image-outset: 0px 0px 0px 0px;
+  border-image-repeat: round round;
+  border-style: solid;
+  padding: 0.1rem 0.5rem;
+}

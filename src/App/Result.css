@@ -1,0 +1,32 @@
+.goals {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  flex: 1 1 auto;
+  padding-bottom: 5rem;
+  mask: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0) 3rem,
+    rgba(0, 0, 0, 1) 6rem,
+    rgba(0, 0, 0, 1) calc(100% - 0.5rem),
+    rgba(0, 0, 0, 0) 100%
+  );
+  mask-repeat: no-repeat;
+}
+.goals::-webkit-scrollbar {
+  display: none;
+}
+
+.goal-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.wins {
+  color: darkgreen;
+}
+.losses {
+  color: #500;
+}
