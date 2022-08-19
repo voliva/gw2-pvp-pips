@@ -195,7 +195,28 @@ function App() {
 
   return (
     <div className="App">
-      {season ? <div>{season.name}</div> : <div>No season active</div>}
+      <div className="header" data-tauri-drag-region>
+        {season ? (
+          <div className="header-title" data-tauri-drag-region>
+            {season.name}
+          </div>
+        ) : (
+          <div className="header-title" data-tauri-drag-region>
+            No season active
+          </div>
+        )}
+        <div className="header-actions">
+          <div>
+            <img
+              src="https://api.iconify.design/mdi:window-minimize.svg"
+              alt="minimize"
+            />
+          </div>
+          <div>
+            <img src="https://api.iconify.design/mdi:close.svg" alt="close" />
+          </div>
+        </div>
+      </div>
       <input
         placeholder="API Key"
         value={apiKey}

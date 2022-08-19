@@ -67,7 +67,9 @@
         "height": 600,
         "resizable": true,
         "title": "GW2 PvP Pips",
-        "width": 800
+        "width": 800,
+        "transparent": true,
+        "decorations": false
       }
     ]
   }
