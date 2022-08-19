@@ -1,0 +1,19 @@
+.division-range {
+  display: flex;
+  flex-direction: column;
+}
+
+.division-range input {
+  padding: 0 1.5rem;
+}
+
+.division-range img,
+.chest {
+  width: 4rem;
+  vertical-align: middle;
+}
+
+.create-goal .rewards {
+  list-style: none;
+  margin: 0;
+}

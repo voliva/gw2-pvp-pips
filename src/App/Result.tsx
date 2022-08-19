@@ -1,50 +1,13 @@
 import { state, useStateObservable } from "@react-rxjs/core";
-import { createSignal, mergeWithKey } from "@react-rxjs/utils";
-import { Fragment } from "react";
-import {
-  combineLatestWith,
-  filter,
-  map,
-  scan,
-  startWith,
-  switchMap,
-  tap,
-} from "rxjs";
+import { Fragment, useState } from "react";
+import { combineLatestWith, filter, map } from "rxjs";
 import { Pip } from "../components/Pip";
-import { Goal, initialConfig$, writeConfig$ } from "../service/localData";
+import { initialConfig$ } from "../service/localData";
+import { CreateGoal } from "./CreateGoal";
+import { deleteGoal, goals$ } from "./goals";
 import { playerDetails$ } from "./playerDetailsState";
 import "./Result.css";
 import { currentSeason$ } from "./season";
-
-const [newGoal$, createGoal] = createSignal<Goal>();
-const [deleteGoal$, deleteGoal] = createSignal<number>(); // id by index
-
-(window as any).createGoal = createGoal;
-
-const goals$ = state(
-  initialConfig$.pipe(
-    map((config) => config.goals),
-    switchMap((initialGoals) =>
-      mergeWithKey({ newGoal$, deleteGoal$ }).pipe(
-        scan((acc, { payload, type }) => {
-          switch (type) {
-            case "deleteGoal$":
-              return acc.filter((_, i) => i !== payload);
-            case "newGoal$":
-              return [...acc, payload];
-          }
-        }, initialGoals),
-        tap((goals) => {
-          writeConfig$({
-            goals,
-          }).subscribe();
-        }),
-        startWith(initialGoals)
-      )
-    )
-  ),
-  []
-);
 
 const holidays$ = state(
   initialConfig$.pipe(map((config) => config.holidays)),
@@ -121,6 +84,7 @@ function getGames(pips: number) {
 function Result() {
   const result = useStateObservable(result$);
   const goals = useStateObservable(goals$);
+  const [creating, setCreating] = useState(false);
 
   function renderResultsPerDay(rpd: number[][]) {
     return rpd.map(([w, l], i) => (
@@ -131,11 +95,23 @@ function Result() {
     ));
   }
 
+  if (creating) {
+    return <CreateGoal onClose={() => setCreating(false)} />;
+  }
+
   return (
     <div className="goals">
       {goals.map(({ title }, id) => (
         <div key={id} className="goal-box painted-box">
-          <div className="goal-title">{title}</div>
+          <div className="goal-title">
+            {title}
+            <span className="btn-delete" onClick={() => deleteGoal(id)}>
+              <img
+                src="https://api.iconify.design/fluent:delete-16-regular.svg"
+                alt="minimize"
+              />
+            </span>
+          </div>
           {result?.goals[id] ? (
             <div className="goal-results">
               <div>
@@ -157,6 +133,11 @@ function Result() {
           ) : null}
         </div>
       ))}
+      <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+        <div className="painted-box">
+          <button onClick={() => setCreating(true)}>Create new Goal</button>
+        </div>
+      </div>
     </div>
   );
 }

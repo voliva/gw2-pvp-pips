@@ -71,7 +71,12 @@ export interface SeasonData {
   name: string;
   start: string;
   end: string;
-  divisions: Array<{ name: string; pips: number }>;
+  divisions: Array<{
+    name: string;
+    repeatable: boolean;
+    icon: string;
+    pips: number;
+  }>;
 }
 
 export interface LastResult {

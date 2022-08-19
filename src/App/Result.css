@@ -5,6 +5,7 @@
   justify-content: center;
   overflow: auto;
   flex: 1 1 auto;
+  padding: 0 5rem;
   padding-bottom: 5rem;
   mask: linear-gradient(
     0deg,
@@ -22,6 +23,11 @@
 .goal-title {
   font-size: 1.1rem;
   font-weight: bold;
+}
+.goal-title .btn-delete {
+  cursor: pointer;
+  vertical-align: middle;
+  margin-left: 0.5rem;
 }
 
 .wins {
