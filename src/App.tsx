@@ -1,3 +1,4 @@
+import { appWindow } from "@tauri-apps/api/window";
 import { shareLatest, state, useStateObservable } from "@react-rxjs/core";
 import { createSignal, mergeWithKey } from "@react-rxjs/utils";
 import {
@@ -5,7 +6,6 @@ import {
   filter,
   map,
   merge,
-  of,
   scan,
   startWith,
   switchMap,
@@ -21,6 +21,8 @@ import {
   writeCache$,
   writeConfig$,
 } from "./localData";
+import pipActive from "./pipActive.png";
+import pipNotActive from "./pipNotActive.png";
 
 const cacheData$ = readCache$().pipe(shareLatest());
 const initialConfig$ = readConfig$().pipe(shareLatest());
@@ -32,7 +34,7 @@ const currentSeason$ = state(
         cache?.seasonData &&
         new Date(cache.seasonData.end).getTime() >= new Date().getTime()
       ) {
-        return of(cache.seasonData);
+        // return of(cache.seasonData);
       }
 
       return getCurrentSeason$().pipe(
@@ -144,19 +146,21 @@ const result$ = state(
       const relevantHolidays = holidays.filter((h) => h >= currentDay).length;
       const remainingDays = seasonDays - currentDay - relevantHolidays;
 
-      return { pips, remainingDays };
+      return { pips, remainingDays, timestamp };
     }),
     combineLatestWith(goals$),
-    map(([{ pips, remainingDays }, goals]) =>
-      goals.map(({ value }) => {
+    map(([{ pips, remainingDays, timestamp }, goals]) => ({
+      timestamp,
+      pips,
+      goals: goals.map(({ value }) => {
         const missingPips = Math.max(0, value - pips);
         const pipsPerDay = missingPips / remainingDays;
         const gamesPerDay = pipsPerDay / POINT_AVG;
         const resultsPerDay = getGames(pipsPerDay);
 
         return { missingPips, pipsPerDay, gamesPerDay, resultsPerDay };
-      })
-    )
+      }),
+    }))
   ),
   null
 );
@@ -197,7 +201,7 @@ function App() {
     <div className="App">
       <div className="header" data-tauri-drag-region>
         {season ? (
-          <div className="header-title" data-tauri-drag-region>
+          <div className="header-title painted-box" data-tauri-drag-region>
             {season.name}
           </div>
         ) : (
@@ -206,43 +210,90 @@ function App() {
           </div>
         )}
         <div className="header-actions">
-          <div>
+          <div onClick={() => appWindow.minimize()}>
             <img
               src="https://api.iconify.design/mdi:window-minimize.svg"
               alt="minimize"
             />
           </div>
-          <div>
+          <div onClick={() => appWindow.close()}>
             <img src="https://api.iconify.design/mdi:close.svg" alt="close" />
           </div>
         </div>
       </div>
-      <input
-        placeholder="API Key"
-        value={apiKey}
-        onChange={(evt) => setApiKey(evt.target.value)}
-      />
-      <button onClick={calculate} disabled={!season}>
-        Calculate
-      </button>
-      {goals.map(({ title }, id) => (
-        <div key={id}>
-          <div>Title: {title}</div>
-          {result?.[id] ? (
-            <div>
-              <div>Missing Pips: {result[id].missingPips}</div>
-              <div>Pips per day: {result[id].pipsPerDay.toFixed(2)}</div>
-              <div>Games per day: {result[id].gamesPerDay.toFixed(2)}</div>
-              <div>
-                Results per day:{" "}
-                {result[id].resultsPerDay
-                  .map(([w, l]) => `${w}/${l}`)
-                  .join(", ")}
-              </div>
-            </div>
-          ) : null}
+      <div className="painted-box">
+        <div>
+          <input
+            placeholder="API Key"
+            value={apiKey}
+            onChange={(evt) => setApiKey(evt.target.value)}
+          />
+          <button onClick={calculate} disabled={!season}>
+            Refresh Pips
+          </button>
         </div>
-      ))}
+        <div>
+          <div>
+            Last update: {result ? result.timestamp.toLocaleString() : "N/A"}
+          </div>
+          <div style={{ fontSize: "1.2rem" }}>
+            <img
+              style={{
+                height: "1.5rem",
+                verticalAlign: "middle",
+                marginRight: "0.2rem",
+              }}
+              alt="pips"
+              src={pipActive}
+            />
+            {result ? result.pips : "N/A"}
+          </div>
+        </div>
+      </div>
+      <div className="goals">
+        {goals.map(({ title }, id) => (
+          <div key={id} className="goal-box painted-box">
+            <div className="goal-title">{title}</div>
+            {result?.goals[id] ? (
+              <div className="goal-results">
+                <div>
+                  <img
+                    style={{
+                      height: "1.5rem",
+                      verticalAlign: "middle",
+                      marginRight: "0.2rem",
+                    }}
+                    alt="pips"
+                    src={pipNotActive}
+                  />
+                  {result.goals[id].missingPips}
+                </div>
+                <div>
+                  <img
+                    style={{
+                      height: "1.5rem",
+                      verticalAlign: "middle",
+                      marginRight: "0.2rem",
+                    }}
+                    alt="pips"
+                    src={pipActive}
+                  />
+                  per day: {result.goals[id].pipsPerDay.toFixed(2)}
+                </div>
+                <div>
+                  Games per day: {result.goals[id].gamesPerDay.toFixed(2)}
+                </div>
+                <div>
+                  Results per day:{" "}
+                  {result.goals[id].resultsPerDay
+                    .map(([w, l]) => `${w}/${l}`)
+                    .join(", ")}
+                </div>
+              </div>
+            ) : null}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

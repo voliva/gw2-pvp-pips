@@ -1,4 +1,4 @@
-import { defer, map, switchMap } from "rxjs";
+import { defer, map, switchMap, tap } from "rxjs";
 import { SeasonData } from "./localData";
 import { fetch } from "@tauri-apps/api/http";
 
@@ -13,6 +13,7 @@ export function getCurrentSeason$() {
       fetch(`https://api.guildwars2.com/v2/pvp/seasons/${seasonId}`)
     ),
     map((result) => result.data as any),
+    tap((result) => console.log(result)),
     map((result): SeasonData | null =>
       result.active
         ? {
