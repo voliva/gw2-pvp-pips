@@ -12,14 +12,24 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true,
+      "all": false,
       "fs": {
-        "scope": ["**"]
+        "all": false,
+        "readFile": true,
+        "writeFile": true,
+        "createDir": true,
+        "scope": ["$CACHE/gw2PipsCache.json", "$APP/config.json", "$APP"]
       },
       "http": {
-        "all": true,
+        "all": false,
         "request": true,
         "scope": ["https://**"]
+      },
+      "window": {
+        "all": false,
+        "close": true,
+        "minimize": true,
+        "startDragging": true
       }
     },
     "bundle": {

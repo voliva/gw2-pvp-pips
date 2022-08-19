@@ -26,7 +26,7 @@ function PlayerDetails() {
           value={apiKey}
           onChange={(evt) => setApiKey(evt.target.value)}
         />
-        <button onClick={refresh} disabled={!season}>
+        <button onClick={refresh} disabled={!season || !apiKey}>
           Refresh Pips
         </button>
       </div>

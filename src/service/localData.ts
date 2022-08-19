@@ -1,3 +1,4 @@
+import { shareLatest } from "@react-rxjs/core";
 import {
   BaseDirectory,
   createDir,
@@ -5,7 +6,6 @@ import {
   writeTextFile,
 } from "@tauri-apps/api/fs";
 import { defer, switchMap } from "rxjs";
-import { shareLatest } from "@react-rxjs/core";
 
 export interface Goal {
   title: string;

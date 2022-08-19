@@ -1,4 +1,4 @@
-import { defer, map, switchMap, tap } from "rxjs";
+import { defer, filter, map, switchMap, tap } from "rxjs";
 import { SeasonData } from "./localData";
 import { fetch } from "@tauri-apps/api/http";
 
@@ -48,6 +48,7 @@ export function getSeasonCurrentPips$(apiKey: string, season_id: string) {
     });
   }).pipe(
     map((result) => result.data as any),
+    filter((result) => Array.isArray(result)),
     map(
       (result): number =>
         result.find((line: any) => line.season_id === season_id).current
