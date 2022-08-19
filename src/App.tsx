@@ -6,6 +6,7 @@ import {
   filter,
   map,
   merge,
+  of,
   scan,
   startWith,
   switchMap,
@@ -23,6 +24,12 @@ import {
 } from "./localData";
 import pipActive from "./pipActive.png";
 import pipNotActive from "./pipNotActive.png";
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en";
+import { Fragment } from "react";
+
+TimeAgo.addDefaultLocale(en);
+const timeAgo = new TimeAgo("en");
 
 const cacheData$ = readCache$().pipe(shareLatest());
 const initialConfig$ = readConfig$().pipe(shareLatest());
@@ -34,7 +41,7 @@ const currentSeason$ = state(
         cache?.seasonData &&
         new Date(cache.seasonData.end).getTime() >= new Date().getTime()
       ) {
-        // return of(cache.seasonData);
+        return of(cache.seasonData);
       }
 
       return getCurrentSeason$().pipe(
@@ -188,7 +195,7 @@ function getGames(pips: number) {
     return cW + cL < pW + pL;
   });
 
-  return filtered;
+  return filtered.reverse();
 }
 
 function App() {
@@ -197,18 +204,21 @@ function App() {
   const result = useStateObservable(result$);
   const goals = useStateObservable(goals$);
 
+  function renderResultsPerDay(rpd: number[][]) {
+    return rpd.map(([w, l], i) => (
+      <Fragment key={i}>
+        {i === 0 ? null : " or "}
+        <span className="wins">{w}</span>/<span className="losses">{l}</span>
+      </Fragment>
+    ));
+  }
+
   return (
     <div className="App">
       <div className="header" data-tauri-drag-region>
-        {season ? (
-          <div className="header-title painted-box" data-tauri-drag-region>
-            {season.name}
-          </div>
-        ) : (
-          <div className="header-title" data-tauri-drag-region>
-            No season active
-          </div>
-        )}
+        <div className="header-title painted-box" data-tauri-drag-region>
+          {season ? season.name : "PvP Pips Calculator"}
+        </div>
         <div className="header-actions">
           <div onClick={() => appWindow.minimize()}>
             <img
@@ -234,7 +244,7 @@ function App() {
         </div>
         <div>
           <div>
-            Last update: {result ? result.timestamp.toLocaleString() : "N/A"}
+            Last update: {result ? timeAgo.format(result.timestamp) : "N/A"}
           </div>
           <div style={{ fontSize: "1.2rem" }}>
             <img
@@ -285,9 +295,7 @@ function App() {
                 </div>
                 <div>
                   Results per day:{" "}
-                  {result.goals[id].resultsPerDay
-                    .map(([w, l]) => `${w}/${l}`)
-                    .join(", ")}
+                  {renderResultsPerDay(result.goals[id].resultsPerDay)}
                 </div>
               </div>
             ) : null}
