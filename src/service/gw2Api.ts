@@ -1,6 +1,28 @@
-import { defer, filter, map, switchMap, tap } from "rxjs";
+import { fetch as tauriFetch } from "@tauri-apps/api/http";
+import { defer, filter, map, switchMap } from "rxjs";
 import { SeasonData } from "./localData";
-import { fetch } from "@tauri-apps/api/http";
+import { isTauri } from "./tauri";
+
+const nativeFetch = window.fetch;
+
+const fetch: typeof tauriFetch = isTauri()
+  ? tauriFetch
+  : (url, options) =>
+      nativeFetch(url, {
+        method: options?.method ?? "GET",
+        headers: (options?.headers as any) ?? {},
+      }).then(async (response) => {
+        const data = await response.json();
+
+        return {
+          url: response.url,
+          status: response.status,
+          ok: response.status >= 200 && response.status < 300,
+          headers: response.headers as any,
+          rawHeaders: response.headers as any,
+          data,
+        };
+      });
 
 export function getCurrentSeason$() {
   return defer(() => {
@@ -32,8 +54,8 @@ export function getCurrentSeason$() {
             })),
           }
         : null
-    ),
-    tap((result) => console.log(result))
+    )
+    // tap((result) => console.log(result))
   );
 }
 

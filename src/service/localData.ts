@@ -2,10 +2,12 @@ import { shareLatest } from "@react-rxjs/core";
 import {
   BaseDirectory,
   createDir,
+  FsOptions,
   readTextFile,
   writeTextFile,
 } from "@tauri-apps/api/fs";
 import { defer, switchMap } from "rxjs";
+import { isTauri } from "./tauri";
 
 export interface Goal {
   title: string;
@@ -34,9 +36,11 @@ const defaultConfig: Config = {
 const readConfig$ = () =>
   defer(async () => {
     try {
-      const content = await readTextFile("config.json", {
+      const content = await readTextFileCP("config.json", {
         dir: BaseDirectory.App,
       });
+
+      if (!content) return defaultConfig;
 
       return JSON.parse(content) as Config;
     } catch (ex) {
@@ -56,7 +60,7 @@ export const writeConfig$ = (config: Partial<Config>) =>
       } catch (ex) {}
 
       try {
-        await writeTextFile(
+        await writeTextFileCP(
           "config.json",
           JSON.stringify({ ...defaultConfig, ...previousConfig, ...config }),
           {
@@ -97,7 +101,7 @@ export interface CacheData {
 const readCache$ = () =>
   defer(async () => {
     try {
-      const content = await readTextFile("gw2PipsCache.json", {
+      const content = await readTextFileCP("gw2PipsCache.json", {
         dir: BaseDirectory.Cache,
       });
 
@@ -114,7 +118,7 @@ export const writeCache$ = (cacheData: Partial<CacheData>) =>
   readCache$().pipe(
     switchMap(async (prevCache) => {
       try {
-        await writeTextFile(
+        await writeTextFileCP(
           "gw2PipsCache.json",
           JSON.stringify({ ...prevCache, ...cacheData }),
           {
@@ -126,3 +130,14 @@ export const writeCache$ = (cacheData: Partial<CacheData>) =>
       }
     })
   );
+
+const readTextFileCP: typeof readTextFile = (name, options) =>
+  isTauri()
+    ? readTextFile(name, options)
+    : Promise.resolve(localStorage.getItem(name)!);
+
+const writeTextFileCP = (file: string, data: string, options?: FsOptions) => {
+  if (isTauri()) return writeTextFile(file, data, options);
+  localStorage.setItem(file, data);
+  return Promise.resolve();
+};

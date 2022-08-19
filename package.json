@@ -22,8 +22,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "cross-env BROWSER=none react-scripts start",
-    "build": "react-scripts build",
+    "start": "cross-env REACT_APP_STANDALONE=true react-scripts start",
+    "build": "cross-env REACT_APP_STANDALONE=true react-scripts build",
+    "start-tauri": "cross-env BROWSER=none react-scripts start",
+    "build-tauri": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "tauri": "tauri"
