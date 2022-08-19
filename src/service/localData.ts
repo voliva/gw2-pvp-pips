@@ -23,7 +23,12 @@ const defaultConfig: Config = {
   version: 1,
   apiKey: "",
   holidays: [],
-  goals: [],
+  goals: [
+    {
+      title: "All chests",
+      value: 670,
+    },
+  ],
 };
 
 const readConfig$ = () =>

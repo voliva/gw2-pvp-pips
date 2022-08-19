@@ -11,12 +11,25 @@
 .painted-box {
   background-color: rgba(255, 255, 255, 0.66);
   background-clip: padding-box;
-  border-width: 10px 50px;
+  border-width: 18px 13px 15px 12px;
   border-image-source: url("./borders_r_66opacity.png");
+  border-image-slice: 18 13 15 12 fill;
+  border-image-width: 18px 13px 15px 12px;
+  border-image-outset: 0px 0px 0px 0px;
+  border-image-repeat: round round;
+  border-style: solid;
+  padding: 0.1rem 0.5rem;
+}
+
+.painted-line {
+  background-color: rgba(255, 255, 255, 0.66);
+  background-clip: padding-box;
+  border-width: 10px 50px;
+  border-image-source: url("./borders_66opacity.png");
   border-image-slice: 18 130 17 137 fill;
   border-image-width: 10px 50px 10px 50px;
   border-image-outset: 0px 0px 0px 0px;
-  border-image-repeat: round round;
+  border-image-repeat: round stretch;
   border-style: solid;
   padding: 0.1rem 0.5rem;
 }

@@ -13,6 +13,13 @@
   vertical-align: middle;
 }
 
+.create-goal {
+  overflow: auto;
+}
+.create-goal::-webkit-scrollbar {
+  display: none;
+}
+
 .create-goal .rewards {
   list-style: none;
   margin: 0;

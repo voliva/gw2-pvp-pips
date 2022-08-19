@@ -8,7 +8,7 @@ function Header() {
 
   return (
     <div className="header" data-tauri-drag-region>
-      <div className="header-title painted-box" data-tauri-drag-region>
+      <div className="header-title painted-line" data-tauri-drag-region>
         {season ? season.name : "PvP Pips Calculator"}
       </div>
       <div className="header-actions">
