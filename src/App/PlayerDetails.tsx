@@ -1,6 +1,7 @@
 import { useStateObservable } from "@react-rxjs/core";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
+import { useEffect, useState } from "react";
 import { Pip } from "../components/Pip";
 import {
   apiKey$,
@@ -31,10 +32,7 @@ function PlayerDetails() {
         </button>
       </div>
       <div>
-        <div>
-          Last update:{" "}
-          {playerDetails ? timeAgo.format(playerDetails.timestamp) : "N/A"}
-        </div>
+        <RefreshingTimeAgo date={playerDetails?.timestamp} />
         <div style={{ fontSize: "1.2rem" }}>
           <Pip active={true} />
           {playerDetails ? playerDetails.pips : "N/A"}
@@ -42,6 +40,23 @@ function PlayerDetails() {
       </div>
     </div>
   );
+}
+
+function RefreshingTimeAgo({ date }: { date?: Date }) {
+  const [formattedTime, setFormattedTime] = useState(
+    date ? timeAgo.format(date) : "N/A"
+  );
+
+  useEffect(() => {
+    const token = setInterval(() => {
+      setFormattedTime(date ? timeAgo.format(date) : "N/A");
+    }, 60_000);
+    return () => {
+      clearInterval(token);
+    };
+  }, [date]);
+
+  return <div>Last update: {formattedTime}</div>;
 }
 
 export default PlayerDetails;
