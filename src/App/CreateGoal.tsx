@@ -45,8 +45,8 @@ export function CreateGoal({ onClose }: { onClose: () => void }) {
   const repeats = useStateObservable(repeats$);
 
   const rewards = useMemo(
-    () => getRewardForGoal(divisions, repeats.value),
-    [divisions, repeats.value]
+    () => getRewardForGoal(season, divisions, repeats.value),
+    [season, divisions, repeats.value]
   );
   const pips = useMemo(
     () => (season ? calculateCost(season, divisions, repeats.value) : 0),

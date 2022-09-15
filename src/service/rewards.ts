@@ -1,3 +1,5 @@
+import { SeasonData } from "./localData";
+
 interface Rewards {
   shardOfGlory: number;
   unidentifiedDye: number;
@@ -185,14 +187,200 @@ const regularRewards: Array<Rewards> = [
   ),
 ];
 
-export function getRewardForGoal(divisions: number, repeats: number) {
+const mini2v2Rewards: Array<Rewards> = [
+  // Cerulean
+  calculateReward(
+    3,
+    {
+      shardOfGlory: 5,
+      unidentifiedDye: 1,
+      gold: 30_00,
+      transmutationCharge: 1,
+    },
+    {
+      shardOfGlory: 10,
+      unidentifiedDye: 2,
+      warlordArmorBox: 1,
+      pvpLeagueTicket: 10,
+      gold: 5_00_00,
+      transmutationCharge: 1,
+      ascendedShardOfGlory: 25,
+    }
+  ),
+  // Jasper
+  calculateReward(
+    4,
+    {
+      shardOfGlory: 10,
+      unidentifiedDye: 1,
+      gold: 45_00,
+      transmutationCharge: 1,
+    },
+    {
+      shardOfGlory: 15,
+      unidentifiedDye: 2,
+      warlordArmorBox: 1,
+      pvpLeagueTicket: 10,
+      gold: 5_00_00,
+      transmutationCharge: 3,
+      ascendedShardOfGlory: 50,
+    }
+  ),
+  // Saffron
+  calculateReward(
+    5,
+    {
+      shardOfGlory: 15,
+      unidentifiedDye: 1,
+      gold: 60_00,
+      transmutationCharge: 1,
+    },
+    {
+      shardOfGlory: 20,
+      unidentifiedDye: 2,
+      warlordArmorBox: 1,
+      pvpLeagueTicket: 15,
+      gold: 10_00_00,
+      transmutationCharge: 3,
+      ascendedShardOfGlory: 75,
+    }
+  ),
+  // Persimmon
+  calculateReward(
+    5,
+    {
+      shardOfGlory: 20,
+      unidentifiedDye: 1,
+      gold: 75_00,
+      transmutationCharge: 1,
+    },
+    {
+      shardOfGlory: 25,
+      unidentifiedDye: 2,
+      boxOfGrandmasterMarks: 1,
+      warlordArmorBox: 1,
+      pvpLeagueTicket: 15,
+      gold: 10_00_00,
+      transmutationCharge: 5,
+      ascendedShardOfGlory: 75,
+    }
+  ),
+  // Persimmon (Repeatable)
+  calculateReward(
+    5,
+    {
+      shardOfGlory: 20,
+      unidentifiedDye: 1,
+      gold: 75_00,
+      transmutationCharge: 1,
+    },
+    {
+      shardOfGlory: 25,
+      unidentifiedDye: 1,
+      gold: 5_00_00,
+      transmutationCharge: 1,
+      ascendedShardOfGlory: 25,
+    }
+  ),
+];
+
+const mini3v3Rewards: Array<Rewards> = [
+  // Cerulean
+  calculateReward(
+    3,
+    {
+      shardOfGlory: 5,
+      unidentifiedDye: 1,
+      gold: 30_00,
+      transmutationCharge: 1,
+    },
+    {
+      shardOfGlory: 10,
+      unidentifiedDye: 2,
+      warlordArmorBox: 1,
+      pvpLeagueTicket: 10,
+      gold: 5_00_00,
+      transmutationCharge: 1,
+      ascendedShardOfGlory: 25,
+    }
+  ),
+  // Jasper
+  calculateReward(
+    4,
+    {
+      shardOfGlory: 10,
+      unidentifiedDye: 1,
+      gold: 45_00,
+      transmutationCharge: 1,
+    },
+    {
+      shardOfGlory: 15,
+      unidentifiedDye: 2,
+      warlordArmorBox: 1,
+      pvpLeagueTicket: 10,
+      gold: 5_00_00,
+      transmutationCharge: 3,
+      ascendedShardOfGlory: 50,
+    }
+  ),
+  // Saffron
+  calculateReward(
+    5,
+    {
+      shardOfGlory: 15,
+      unidentifiedDye: 1,
+      gold: 60_00,
+      transmutationCharge: 1,
+    },
+    {
+      shardOfGlory: 25,
+      unidentifiedDye: 2,
+      warlordArmorBox: 1,
+      pvpLeagueTicket: 15,
+      gold: 10_00_00,
+      transmutationCharge: 5,
+      ascendedShardOfGlory: 75,
+      boxOfGrandmasterMarks: 1,
+    }
+  ),
+  // Saffron (Repeatable)
+  calculateReward(
+    5,
+    {
+      shardOfGlory: 15,
+      unidentifiedDye: 1,
+      gold: 60_00,
+      transmutationCharge: 1,
+    },
+    {
+      shardOfGlory: 25,
+      unidentifiedDye: 1,
+      gold: 4_00_00,
+      transmutationCharge: 1,
+      ascendedShardOfGlory: 20,
+    }
+  ),
+];
+
+export function getRewardForGoal(
+  season: SeasonData | null,
+  divisions: number,
+  repeats: number
+) {
+  if (!season) return emptyReward;
+
+  const rewards = season.name.includes("3v3 Season")
+    ? mini3v3Rewards
+    : season.name.includes("2v2 Season")
+    ? mini2v2Rewards
+    : regularRewards;
   const result = { ...emptyReward };
 
   for (let i = 0; i < divisions; i++) {
-    addReward(result, regularRewards[i]);
+    addReward(result, rewards[i]);
   }
   for (let i = 0; i < repeats; i++) {
-    addReward(result, regularRewards[regularRewards.length - 1]);
+    addReward(result, rewards[rewards.length - 1]);
   }
 
   return result;

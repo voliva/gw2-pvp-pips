@@ -8,6 +8,7 @@ export function getCurrentSeason$() {
     return fetch(`https://api.guildwars2.com/v2/pvp/seasons`);
   }).pipe(
     map((result) => result.data as any),
+    // tap((result) => console.log(result)),
     map((result): string => result[result.length - 1]),
     switchMap((seasonId) =>
       fetch(`https://api.guildwars2.com/v2/pvp/seasons/${seasonId}`)
@@ -51,8 +52,8 @@ export function getSeasonCurrentPips$(apiKey: string, season_id: string) {
     filter((result) => Array.isArray(result)),
     map(
       (result): number =>
-        result.find((line: any) => line.season_id === season_id).current
-          .total_points
+        result.find((line: any) => line.season_id === season_id)?.current
+          .total_points ?? 1
     )
   );
 }

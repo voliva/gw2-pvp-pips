@@ -51,6 +51,8 @@ function RefreshingTimeAgo({ date }: { date?: Date }) {
     const token = setInterval(() => {
       setFormattedTime(date ? timeAgo.format(date) : "N/A");
     }, 60_000);
+    setFormattedTime(date ? timeAgo.format(date) : "N/A");
+
     return () => {
       clearInterval(token);
     };
