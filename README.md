@@ -11,7 +11,6 @@ A link to the latest release can be found within github: [releases](https://gith
 - Configure win/lose points (at the moment it assumes 4 points when lose, 11 points when winning)
 - Configure win/lose rate (at the moment it assumes 50-50)
 - Configure days that the user can't play (at the moment it assumes all days are playable)
-- Support mini-seasons (at the moment it only supports regular seasons)
 
 ## Technical details
 

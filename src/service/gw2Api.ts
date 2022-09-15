@@ -53,7 +53,7 @@ export function getSeasonCurrentPips$(apiKey: string, season_id: string) {
     map(
       (result): number =>
         result.find((line: any) => line.season_id === season_id)?.current
-          .total_points ?? 1
+          .total_points ?? 0
     )
   );
 }
