@@ -1,4 +1,4 @@
-import { SeasonData } from "./localData";
+import { SeasonDetails } from "./localData";
 
 interface Rewards {
   shardOfGlory: number;
@@ -363,17 +363,18 @@ const mini3v3Rewards: Array<Rewards> = [
 ];
 
 export function getRewardForGoal(
-  season: SeasonData | null,
+  season: SeasonDetails | null,
   divisions: number,
   repeats: number
 ) {
   if (!season) return emptyReward;
 
-  const rewards = season.name.includes("3v3 Season")
-    ? mini3v3Rewards
-    : season.name.includes("2v2 Season")
-    ? mini2v2Rewards
-    : regularRewards;
+  const rewards =
+    season.type === "3v3"
+      ? mini3v3Rewards
+      : season.type === "2v2"
+      ? mini2v2Rewards
+      : regularRewards;
   const result = { ...emptyReward };
 
   for (let i = 0; i < divisions; i++) {

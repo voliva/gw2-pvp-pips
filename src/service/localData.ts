@@ -1,4 +1,4 @@
-import { shareLatest } from "@react-rxjs/core";
+import { shareLatest, state } from "@react-rxjs/core";
 import {
   BaseDirectory,
   createDir,
@@ -12,10 +12,16 @@ export interface Goal {
   value: number;
 }
 
+export interface ManualSeason {
+  type: "2v2" | "3v3" | "5v5";
+  end: string | undefined;
+}
+
 export interface Config {
   version: 1;
   apiKey: string;
   holidays: number[]; // day0 = start of season
+  season: ManualSeason;
   goals: Goal[];
 }
 
@@ -23,6 +29,10 @@ const defaultConfig: Config = {
   version: 1,
   apiKey: "",
   holidays: [],
+  season: {
+    type: "2v2",
+    end: undefined,
+  },
   goals: [
     {
       title: "All chests",
@@ -38,14 +48,18 @@ const readConfig$ = () =>
         dir: BaseDirectory.App,
       });
 
-      return JSON.parse(content) as Config;
+      const parsed = JSON.parse(content) as Partial<Config>;
+      return {
+        ...defaultConfig,
+        ...parsed,
+      };
     } catch (ex) {
       console.error(ex);
       return defaultConfig;
     }
   });
 
-export const initialConfig$ = readConfig$().pipe(shareLatest());
+export const initialConfig$ = state(readConfig$());
 
 export const writeConfig$ = (config: Partial<Config>) =>
   readConfig$().pipe(
@@ -70,18 +84,23 @@ export const writeConfig$ = (config: Partial<Config>) =>
   );
 
 /** CACHED DATA **/
+export interface Division {
+  name: string;
+  repeatable: boolean;
+  icon: string;
+  pips: number;
+}
+// This is the data needed to calculate everything, but it doesn't have data generated from API
+export interface SeasonDetails {
+  type: "2v2" | "3v3" | "5v5";
+  end: string;
+  divisions: Array<Division>;
+}
 
-export interface SeasonData {
+export interface SeasonData extends SeasonDetails {
   id: string;
   name: string;
   start: string;
-  end: string;
-  divisions: Array<{
-    name: string;
-    repeatable: boolean;
-    icon: string;
-    pips: number;
-  }>;
 }
 
 export interface LastResult {

@@ -2,39 +2,26 @@ import { state, useStateObservable } from "@react-rxjs/core";
 import { Fragment, useState } from "react";
 import { combineLatestWith, filter, map } from "rxjs";
 import { Pip } from "../components/Pip";
-import { initialConfig$ } from "../service/localData";
 import { CreateGoal } from "./CreateGoal";
 import { deleteGoal, goals$ } from "./goals";
-import { playerDetails$ } from "./playerDetailsState";
+import { playerDetails$, selectedSeason$ } from "./playerDetailsState";
 import "./Result.css";
-import { currentSeason$ } from "./season";
-
-const holidays$ = state(
-  initialConfig$.pipe(map((config) => config.holidays)),
-  []
-);
 
 // TODO config
-const POINTS_WIN = 11;
-const POINTS_LOSE = 4;
+const POINTS_WIN = 11 + 2;
+const POINTS_LOSE = 4 + 2;
 const POINT_AVG = (POINTS_LOSE + POINTS_WIN) / 2;
 
 const result$ = state(
   playerDetails$.pipe(
     filter((v) => !!v),
     map((v) => v!),
-    combineLatestWith(holidays$, currentSeason$.pipe(filter((v) => !!v))),
-    map(([{ pips, timestamp }, holidays, season]) => {
-      const seasonStart = new Date(season!.start);
+    combineLatestWith(selectedSeason$.pipe(filter((v) => !!v))),
+    map(([{ pips, timestamp }, season]) => {
       const seasonEnd = new Date(season!.end);
-      const seasonDays = Math.round(
-        (seasonEnd.getTime() - seasonStart.getTime()) / (24 * 60 * 60_000)
+      const remainingDays = Math.round(
+        (seasonEnd.getTime() - timestamp.getTime()) / (24 * 60 * 60_000)
       );
-      const currentDay = Math.floor(
-        (timestamp.getTime() - seasonStart.getTime()) / (24 * 60 * 60_000)
-      );
-      const relevantHolidays = holidays.filter((h) => h >= currentDay).length;
-      const remainingDays = seasonDays - currentDay - relevantHolidays;
 
       return { pips, remainingDays, timestamp };
     }),

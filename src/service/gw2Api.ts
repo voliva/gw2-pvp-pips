@@ -14,27 +14,28 @@ export function getCurrentSeason$() {
       fetch(`https://api.guildwars2.com/v2/pvp/seasons/${seasonId}`)
     ),
     map((result) => result.data as any),
-    // tap((result) => console.log(result)),
-    map((result): SeasonData | null =>
-      result.active
-        ? {
-            id: result.id,
-            name: result.name,
-            start: result.start,
-            end: result.end,
-            divisions: result.divisions.map((division: any) => ({
-              name: division.name,
-              repeatable: division.flags.includes("Repeatable"),
-              pips: (division.tiers as Array<any>).reduce(
-                (acc, tier) => acc + tier.points,
-                0
-              ),
-              icon: division.large_icon,
-            })),
-          }
-        : null
+    map(
+      (result): SeasonData => ({
+        id: result.id,
+        name: result.name,
+        type: result.name.includes("3v3 Season")
+          ? "3v3"
+          : result.name.includes("2v2 Season")
+          ? "2v2"
+          : "5v5",
+        start: result.start,
+        end: result.end,
+        divisions: result.divisions.map((division: any) => ({
+          name: division.name,
+          repeatable: division.flags.includes("Repeatable"),
+          pips: (division.tiers as Array<any>).reduce(
+            (acc, tier) => acc + tier.points,
+            0
+          ),
+          icon: division.large_icon,
+        })),
+      })
     )
-    // tap((result) => console.log(result))
   );
 }
 
