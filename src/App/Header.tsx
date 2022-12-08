@@ -1,15 +1,16 @@
 import { useStateObservable } from "@react-rxjs/core";
 import { appWindow } from "@tauri-apps/api/window";
-import { currentSeason$ } from "./season";
+import { currentSeason$, seasonIsActive } from "./season";
 import "./Header.css";
 
 function Header() {
   const season = useStateObservable(currentSeason$);
+  const isActive = seasonIsActive(season);
 
   return (
     <div className="header" data-tauri-drag-region>
       <div className="header-title painted-line" data-tauri-drag-region>
-        {season ? season.name : "PvP Pips Calculator"}
+        {season && isActive ? season.name : "PvP Pips Calculator"}
       </div>
       <div className="header-actions">
         <div onClick={() => appWindow.minimize()}>

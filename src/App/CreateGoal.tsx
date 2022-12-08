@@ -6,6 +6,7 @@ import { SeasonData } from "../service/localData";
 import { getRewardForGoal } from "../service/rewards";
 import "./CreateGoal.css";
 import { createGoal } from "./goals";
+import { selectedSeason$ } from "./playerDetailsState";
 import { currentSeason$ } from "./season";
 
 const [nameChange$, setName] = createSignal<string>();
@@ -16,7 +17,7 @@ const divisions$ = state(divisionsChange$, 1); // TODO minimum depends on curren
 
 const [repeatsChange$, setRepeats] = createSignal<number>();
 const repeats$ = state(
-  combineLatest([currentSeason$, divisionsChange$]).pipe(
+  combineLatest([selectedSeason$, divisionsChange$]).pipe(
     switchMap(([season, divisions]) =>
       divisions === season?.divisions.length
         ? repeatsChange$.pipe(
@@ -39,7 +40,7 @@ const repeats$ = state(
 );
 
 export function CreateGoal({ onClose }: { onClose: () => void }) {
-  const season = useStateObservable(currentSeason$);
+  const season = useStateObservable(selectedSeason$);
   const name = useStateObservable(name$);
   const divisions = useStateObservable(divisions$);
   const repeats = useStateObservable(repeats$);

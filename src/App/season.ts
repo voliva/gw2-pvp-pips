@@ -1,15 +1,16 @@
 import { state } from "@react-rxjs/core";
-import { of, switchMap, tap } from "rxjs";
+import { filter, map, of, switchMap, tap } from "rxjs";
 import { getCurrentSeason$ } from "../service/gw2Api";
-import { cacheData$, writeCache$ } from "../service/localData";
+import { cacheData$, SeasonData, writeCache$ } from "../service/localData";
+
+export function seasonIsActive(season: SeasonData | null) {
+  return season && new Date(season.end).getTime() >= new Date().getTime();
+}
 
 export const currentSeason$ = state(
   cacheData$.pipe(
     switchMap((cache) => {
-      if (
-        cache?.seasonData &&
-        new Date(cache.seasonData.end).getTime() >= new Date().getTime()
-      ) {
+      if (cache?.seasonData && seasonIsActive(cache.seasonData)) {
         return of(cache.seasonData);
       }
 
@@ -21,6 +22,14 @@ export const currentSeason$ = state(
         })
       );
     })
+  ),
+  null
+);
+
+export const currentSeasonIsActive$ = state(
+  currentSeason$.pipe(
+    filter((v) => !!v),
+    map((v) => seasonIsActive(v!))
   ),
   null
 );

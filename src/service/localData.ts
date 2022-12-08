@@ -70,18 +70,18 @@ export const writeConfig$ = (config: Partial<Config>) =>
   );
 
 /** CACHED DATA **/
-
+export interface Division {
+  name: string;
+  repeatable: boolean;
+  icon: string;
+  pips: number;
+}
 export interface SeasonData {
   id: string;
   name: string;
   start: string;
   end: string;
-  divisions: Array<{
-    name: string;
-    repeatable: boolean;
-    icon: string;
-    pips: number;
-  }>;
+  divisions: Array<Division>;
 }
 
 export interface LastResult {
