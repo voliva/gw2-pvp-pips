@@ -2,11 +2,11 @@ import { state, useStateObservable } from "@react-rxjs/core";
 import { createSignal } from "@react-rxjs/utils";
 import { useMemo } from "react";
 import { combineLatest, map, of, startWith, switchMap } from "rxjs";
-import { SeasonData } from "../service/localData";
+import { SeasonDetails } from "../service/localData";
 import { getRewardForGoal } from "../service/rewards";
 import "./CreateGoal.css";
 import { createGoal } from "./goals";
-import { currentSeason$ } from "./season";
+import { selectedSeason$ } from "./playerDetailsState";
 
 const [nameChange$, setName] = createSignal<string>();
 const name$ = state(nameChange$, "");
@@ -16,7 +16,7 @@ const divisions$ = state(divisionsChange$, 1); // TODO minimum depends on curren
 
 const [repeatsChange$, setRepeats] = createSignal<number>();
 const repeats$ = state(
-  combineLatest([currentSeason$, divisionsChange$]).pipe(
+  combineLatest([selectedSeason$, divisionsChange$]).pipe(
     switchMap(([season, divisions]) =>
       divisions === season?.divisions.length
         ? repeatsChange$.pipe(
@@ -39,7 +39,7 @@ const repeats$ = state(
 );
 
 export function CreateGoal({ onClose }: { onClose: () => void }) {
-  const season = useStateObservable(currentSeason$);
+  const season = useStateObservable(selectedSeason$);
   const name = useStateObservable(name$);
   const divisions = useStateObservable(divisions$);
   const repeats = useStateObservable(repeats$);
@@ -145,7 +145,11 @@ export function CreateGoal({ onClose }: { onClose: () => void }) {
   );
 }
 
-function calculateCost(season: SeasonData, divisions: number, repeats: number) {
+function calculateCost(
+  season: SeasonDetails,
+  divisions: number,
+  repeats: number
+) {
   let result = 0;
   for (let i = 0; i < divisions; i++) {
     result += season.divisions[i].pips;

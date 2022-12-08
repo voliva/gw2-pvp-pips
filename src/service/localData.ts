@@ -70,18 +70,23 @@ export const writeConfig$ = (config: Partial<Config>) =>
   );
 
 /** CACHED DATA **/
+export interface Division {
+  name: string;
+  repeatable: boolean;
+  icon: string;
+  pips: number;
+}
+// This is the data needed to calculate everything, but it doesn't have data generated from API
+export interface SeasonDetails {
+  type: "2v2" | "3v3" | "5v5";
+  end: string;
+  divisions: Array<Division>;
+}
 
-export interface SeasonData {
+export interface SeasonData extends SeasonDetails {
   id: string;
   name: string;
   start: string;
-  end: string;
-  divisions: Array<{
-    name: string;
-    repeatable: boolean;
-    icon: string;
-    pips: number;
-  }>;
 }
 
 export interface LastResult {
