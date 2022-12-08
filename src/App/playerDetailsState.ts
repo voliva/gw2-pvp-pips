@@ -8,6 +8,7 @@ import {
   merge,
   Observable,
   switchMap,
+  take,
   tap,
   withLatestFrom,
 } from "rxjs";
@@ -117,9 +118,47 @@ export const playerDetails$ = state<PlayerDetails | null>(
   null
 );
 
-export const selectedType$ = state(selectedTypeChange$, "2v2");
+export const selectedType$ = state(
+  merge(
+    initialConfig$.pipe(map((v) => v.season.type)),
+    selectedTypeChange$.pipe(
+      tap((type) => {
+        initialConfig$
+          .pipe(
+            map((v) => v.season.end),
+            take(1),
+            switchMap((end) =>
+              writeConfig$({
+                season: { type, end },
+              })
+            )
+          )
+          .subscribe();
+      })
+    )
+  ),
+  "2v2"
+);
 export const endDate$ = state(
-  endDateChange$.pipe(map((v) => (v ? v : null))),
+  merge(
+    initialConfig$.pipe(map((v) => v.season.end ?? null)),
+    endDateChange$.pipe(
+      map((v) => (v ? v : null)),
+      tap((end) => {
+        initialConfig$
+          .pipe(
+            map((v) => v.season.type),
+            take(1),
+            switchMap((type) =>
+              writeConfig$({
+                season: { type, end: end ?? undefined },
+              })
+            )
+          )
+          .subscribe();
+      })
+    )
+  ),
   null
 );
 
